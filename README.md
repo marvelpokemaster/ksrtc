@@ -1,6 +1,6 @@
 # ksrtc
 
-mkdir ksrtc-management-system
-cd ksrtc-management-system
-npm init -y
-npm install express mysql2 body-parser
+mkdir ksrtc-management-system</br>
+cd ksrtc-management-system</br>
+npm init -y</br>
+npm install express mysql2 body-parser</br>
