@@ -1,21 +1,6 @@
-CREATE TABLE Bus (
-    BusNumber INT PRIMARY KEY,
-    BusType VARCHAR(50),
-    Seats INT,
-    DriverID INT,
-    ConductorID INT,
-    AssistantID INT,
-    FOREIGN KEY (DriverID) REFERENCES Driver(DriverID),
-    FOREIGN KEY (ConductorID) REFERENCES Conductor(ConductorID),
-    FOREIGN KEY (AssistantID) REFERENCES Assistant(AssistantID)
-);
-
-CREATE TABLE AssignedTo (
-    BusNumber INT ,
-    RouteID INT,
-    PRIMARY KEY (BusNumber, RouteID),
-    FOREIGN KEY (BusNumber) REFERENCES Bus(BusNumber),
-    FOREIGN KEY (RouteID) REFERENCES Route(RouteID)
+CREATE TABLE BusStand (
+    StandID INT PRIMARY KEY,
+    StandLocation VARCHAR(50)
 );
 
 CREATE TABLE Driver (
@@ -40,6 +25,26 @@ CREATE TABLE Route (
     ScheduleDate DATE
 );
 
+CREATE TABLE Bus (
+    BusNumber INT PRIMARY KEY,
+    BusType VARCHAR(50),
+    Seats INT,
+    DriverID INT,
+    ConductorID INT,
+    AssistantID INT,
+    FOREIGN KEY (DriverID) REFERENCES Driver(DriverID),
+    FOREIGN KEY (ConductorID) REFERENCES Conductor(ConductorID),
+    FOREIGN KEY (AssistantID) REFERENCES Assistant(AssistantID)
+);
+
+CREATE TABLE AssignedTo (
+    BusNumber INT,
+    RouteID INT,
+    PRIMARY KEY (BusNumber, RouteID),
+    FOREIGN KEY (BusNumber) REFERENCES Bus(BusNumber),
+    FOREIGN KEY (RouteID) REFERENCES Route(RouteID)
+);
+
 CREATE TABLE Halt (
     HaltID INT PRIMARY KEY,
     RouteID INT,
@@ -49,11 +54,6 @@ CREATE TABLE Halt (
     StandID INT,
     FOREIGN KEY (RouteID) REFERENCES Route(RouteID),
     FOREIGN KEY (StandID) REFERENCES BusStand(StandID)
-);
-
-CREATE TABLE BusStand (
-    StandID INT PRIMARY KEY,
-    StandLocation VARCHAR(50)
 );
 
 CREATE TABLE Passenger (
