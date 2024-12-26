@@ -10,6 +10,14 @@ CREATE TABLE Bus (
     FOREIGN KEY (AssistantID) REFERENCES Assistant(AssistantID)
 );
 
+CREATE TABLE AssignedTo (
+    BusNumber INT ,
+    RouteID INT,
+    PRIMARY KEY (BusNumber, RouteID),
+    FOREIGN KEY (BusNumber) REFERENCES Bus(BusNumber),
+    FOREIGN KEY (RouteID) REFERENCES Route(RouteID)
+);
+
 CREATE TABLE Driver (
     DriverID INT PRIMARY KEY,
     DriverName VARCHAR(50)
