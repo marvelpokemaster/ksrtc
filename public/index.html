@@ -1,24 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KSRTC Management System</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Search</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>KSRTC Bus Schedules</h1>
-  <table id="scheduleTable">
-    <thead>
-      <tr>
-        <th>Bus Number</th>
-        <th>Route</th>
-        <th>Departure</th>
-        <th>Arrival</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <script src="script.js"></script>
+    <section id="search-routes">
+        <h2>Search Routes</h2>
+        <form id="search-form">
+            <label for="source">Source:</label>
+            <select id="source" name="source" required>
+                <option value="" disabled selected>Select Source</option>
+                <!-- Options will be populated here -->
+            </select>
+
+            <label for="destination">Destination:</label>
+            <select id="destination" name="destination" required>
+                <option value="" disabled selected>Select Destination</option>
+                <!-- Options will be populated here -->
+            </select>
+
+            <label for="date">Travel Date:</label>
+            <input type="date" id="date" name="date" required>
+
+            <button type="submit">Search</button>
+        </form>
+    </section>
+
+    <section id="routes-list">
+        <h3>Available Routes</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Route ID</th>
+                    <th>Source</th>
+                    <th>Destination</th>
+                    <th>Schedule Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Routes will be populated here -->
+            </tbody>
+        </table>
+    </section>
+
+    <script src="script.js"></script>
 </body>
 </html>
