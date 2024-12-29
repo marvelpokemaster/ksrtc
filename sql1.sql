@@ -1,4 +1,4 @@
-\c ksrtc_db
+\c ksrtc_db;
 
 DROP TABLE IF EXISTS Ticket, Passenger, Halt, AssignedTo, Bus, Route, Assistant, Conductor, Driver, BusStand CASCADE;
 
