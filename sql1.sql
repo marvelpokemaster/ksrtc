@@ -1,36 +1,43 @@
+-- Connect to the default database (postgres) and drop the existing database if necessary
+
+DROP DATABASE IF EXISTS ksrtc_db;
+\c postgres;
+-- Create the new ksrtc_db database
+CREATE DATABASE ksrtc_db;
+
+-- Connect to the newly created ksrtc_db
 \c ksrtc_db;
 
-DROP TABLE IF EXISTS Ticket, Passenger, Halt, AssignedTo, Bus, Route, Assistant, Conductor, Driver, BusStand CASCADE;
-
+-- Create tables
 CREATE TABLE BusStand (
-    StandID INT PRIMARY KEY,
+    StandID SERIAL PRIMARY KEY,
     StandLocation VARCHAR(50)
 );
 
 CREATE TABLE Driver (
-    DriverID INT PRIMARY KEY,
+    DriverID SERIAL PRIMARY KEY,
     DriverName VARCHAR(50)
 );
 
 CREATE TABLE Conductor (
-    ConductorID INT PRIMARY KEY,
+    ConductorID SERIAL PRIMARY KEY,
     ConductorName VARCHAR(50)
 );
 
 CREATE TABLE Assistant (
-    AssistantID INT PRIMARY KEY,
+    AssistantID SERIAL PRIMARY KEY,
     AssistantName VARCHAR(50)
 );
 
 CREATE TABLE Route (
-    RouteID INT PRIMARY KEY,
+    RouteID SERIAL PRIMARY KEY,
     Source VARCHAR(50),
     Destination VARCHAR(50),
     ScheduleDate DATE
 );
 
 CREATE TABLE Bus (
-    BusNumber INT PRIMARY KEY,
+    BusNumber SERIAL PRIMARY KEY,
     BusType VARCHAR(50),
     Seats INT,
     DriverID INT,
@@ -50,7 +57,7 @@ CREATE TABLE AssignedTo (
 );
 
 CREATE TABLE Halt (
-    HaltID INT PRIMARY KEY,
+    HaltID SERIAL PRIMARY KEY,
     RouteID INT,
     SequenceNo INT,
     ArrivalTime TIME,
@@ -61,50 +68,65 @@ CREATE TABLE Halt (
 );
 
 CREATE TABLE Passenger (
-    PassengerID INT PRIMARY KEY,
+    PassengerID SERIAL PRIMARY KEY,
     PassengerName VARCHAR(50),
     Contact VARCHAR(15)
 );
 
-CREATE TABLE Ticket (
-    TicketID INT,
-    PassengerID INT,
+CREATE TABLE Fare (
+    FareID SERIAL PRIMARY KEY,
     RouteID INT,
-    SeatNumber INT,
-    Fare DECIMAL(10, 2),
-    PRIMARY KEY (TicketID, PassengerID, RouteID),
-    FOREIGN KEY (PassengerID) REFERENCES Passenger(PassengerID),
+    FareAmount DECIMAL(10, 2),
     FOREIGN KEY (RouteID) REFERENCES Route(RouteID)
 );
 
--- Insert data
-INSERT INTO BusStand (StandID, StandLocation)
-VALUES (1, 'Ernakulam Stand'), (2, 'Thrissur Stand'), (3, 'Kozhikode Stand');
+CREATE TABLE Ticket (
+    TicketID SERIAL PRIMARY KEY,
+    PassengerID INT,
+    RouteID INT,
+    SeatNumber INT,
+    FareID INT,
+    FOREIGN KEY (PassengerID) REFERENCES Passenger(PassengerID),
+    FOREIGN KEY (RouteID) REFERENCES Route(RouteID),
+    FOREIGN KEY (FareID) REFERENCES Fare(FareID)
+);
 
-INSERT INTO Driver (DriverID, DriverName)
-VALUES (1, 'Suresh Kumar'), (2, 'Ramesh Nair');
+-- Insert sample data
 
-INSERT INTO Conductor (ConductorID, ConductorName)
-VALUES (1, 'Ajith Menon'), (2, 'Praveen Thomas');
+INSERT INTO BusStand (StandLocation)
+VALUES ('Ernakulam Stand'), ('Thrissur Stand'), ('Kozhikode Stand');
 
-INSERT INTO Assistant (AssistantID, AssistantName)
-VALUES (1, 'Biju Varghese'), (2, 'Shaji Mathew');
+INSERT INTO Driver (DriverName)
+VALUES ('Suresh Kumar'), ('Ramesh Nair');
 
-INSERT INTO Route (RouteID, Source, Destination, ScheduleDate)
-VALUES (1, 'Kochi', 'Trivandrum', '2024-12-29'), (2, 'Kottayam', 'Palakkad', '2024-12-30');
+INSERT INTO Conductor (ConductorName)
+VALUES ('Ajith Menon'), ('Praveen Thomas');
 
-INSERT INTO Bus (BusNumber, BusType, Seats, DriverID, ConductorID, AssistantID)
-VALUES (101, 'Fast Passenger', 40, 1, 1, 1), (102, 'Super Deluxe', 30, 2, 2, 2);
+INSERT INTO Assistant (AssistantName)
+VALUES ('Biju Varghese'), ('Shaji Mathew');
+
+INSERT INTO Route (Source, Destination, ScheduleDate)
+VALUES ('Kochi', 'Trivandrum', '2024-12-29'), ('Kottayam', 'Palakkad', '2024-12-30');
+
+INSERT INTO Bus (BusType, Seats, DriverID, ConductorID, AssistantID)
+VALUES ('Fast Passenger', 40, 1, 1, 1), ('Super Deluxe', 30, 2, 2, 2);
 
 INSERT INTO AssignedTo (BusNumber, RouteID)
-VALUES (101, 1), (102, 2);
+VALUES (1, 1), (2, 2);
 
-INSERT INTO Halt (HaltID, RouteID, SequenceNo, ArrivalTime, DepartureTime, StandID)
-VALUES (1, 1, 1, '08:00:00', '08:15:00', 1), (2, 1, 2, '09:00:00', '09:15:00', 2),
-       (3, 2, 1, '10:00:00', '10:15:00', 2), (4, 2, 2, '11:00:00', '11:15:00', 3);
+INSERT INTO Halt (RouteID, SequenceNo, ArrivalTime, DepartureTime, StandID)
+VALUES (1, 1, '08:00:00', '08:15:00', 1),
+       (1, 2, '09:00:00', '09:15:00', 2),
+       (2, 1, '10:00:00', '10:15:00', 2),
+       (2, 2, '11:00:00', '11:15:00', 3);
 
-INSERT INTO Passenger (PassengerID, PassengerName, Contact)
-VALUES (1, 'Anjali Pillai', '9876543210'), (2, 'Rajesh Menon', '8765432109');
+INSERT INTO Passenger (PassengerName, Contact)
+VALUES ('Anjali Pillai', '9876543210'), ('Rajesh Menon', '8765432109');
 
-INSERT INTO Ticket (TicketID, PassengerID, RouteID, SeatNumber, Fare)
-VALUES (1, 1, 1, 5, 150.00), (2, 2, 2, 10, 200.00);
+INSERT INTO Fare (RouteID, FareAmount)
+VALUES (1, 150.00), (2, 200.00);
+
+INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
+VALUES (1, 1, 5, 1), (2, 2, 10, 2);
+
+-- The schema is now ready and populated with sample data.

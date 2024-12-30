@@ -32,6 +32,8 @@ app.get('/locations', async (req, res) => {
         const destinationResult = await pool.query('SELECT DISTINCT Destination FROM Route');
         const destinations = destinationResult.rows.map(row => row.destination);
 
+        console.log({ sources, destinations });  // Log the result to check
+
         res.json({ sources, destinations });
     } catch (err) {
         console.error(err);
@@ -55,20 +57,34 @@ app.get('/routes', async (req, res) => {
 });
 
 // Endpoint to book a ticket
+// Endpoint to book a ticket
 app.post('/book', async (req, res) => {
-    const { routeId, passengerName, contact, seatNumber, fare } = req.body;
+    const { routeId, passengerName, contact, seatNumber } = req.body;
     try {
+        // Fetch fare for the route
+        const fareResult = await pool.query(
+            'SELECT FareID, FareAmount FROM Fare WHERE RouteID = $1',
+            [routeId]
+        );
+        if (fareResult.rows.length === 0) {
+            return res.status(400).json({ error: 'Fare not found for the selected route' });
+        }
+        const fare = fareResult.rows[0];
+
+        // Insert passenger
         const passengerResult = await pool.query(
             'INSERT INTO Passenger (PassengerName, Contact) VALUES ($1, $2) RETURNING PassengerID',
             [passengerName, contact]
         );
         const passengerId = passengerResult.rows[0].passengerid;
 
-        await pool.query(
-            'INSERT INTO Ticket (TicketID, PassengerID, RouteID, SeatNumber, Fare) VALUES (DEFAULT, $1, $2, $3, $4)',
-            [passengerId, routeId, seatNumber, fare]
+        // Insert ticket
+        const ticketResult = await pool.query(
+            'INSERT INTO Ticket (TicketID, PassengerID, RouteID, SeatNumber, FareID) VALUES (DEFAULT, $1, $2, $3, $4) RETURNING TicketID',
+            [passengerId, routeId, seatNumber, fare.FareID]
         );
-        res.json({ success: true, message: 'Ticket booked successfully!' });
+
+        res.json({ success: true, message: 'Ticket booked successfully!', ticketId: ticketResult.rows[0].ticketid });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Database error' });
