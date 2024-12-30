@@ -3,47 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KSRTC Route Search</title>
+    <title>KSRTC Management</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <section id="search-routes">
-        <h2>Search KSRTC Routes</h2>
-        <form id="search-form">
-            <label for="source">Source:</label>
-            <select id="source" name="source" required>
-                <option value="" disabled selected>Select Source</option>
-            </select>
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h2>Login</h2>
+            <form id="login-form">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
 
-            <label for="destination">Destination:</label>
-            <select id="destination" name="destination" required>
-                <option value="" disabled selected>Select Destination</option>
-            </select>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
-            <label for="date">Travel Date:</label>
-            <input type="date" id="date" name="date" required>
+                <button type="submit" id="login-button">Login</button>
+            </form>
+        </div>
+    </div>
 
-            <button type="submit">Search</button>
-        </form>
-    </section>
+    <main id="main-content" class="hidden">
+        <header>
+            <h1>KSRTC Management System</h1>
+        </header>
 
-    <section id="routes-list">
-        <h3>Available Routes</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Route ID</th>
-                    <th>Source</th>
-                    <th>Destination</th>
-                    <th>Schedule Date</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Routes will be populated here -->
-            </tbody>
-        </table>
-    </section>
+        <section id="search-routes">
+            <h2>Search KSRTC Routes</h2>
+            <form id="search-form">
+                <label for="source">Source:</label>
+                <select id="source" name="source" required>
+                    <option value="" disabled selected>Select Source</option>
+                </select>
+
+                <label for="destination">Destination:</label>
+                <select id="destination" name="destination" required>
+                    <option value="" disabled selected>Select Destination</option>
+                </select>
+
+                <label for="date">Travel Date:</label>
+                <input type="date" id="date" name="date" required>
+
+                <button type="submit">Search</button>
+            </form>
+        </section>
+
+        <section id="routes-list" class="hidden">
+            <h3>Available Routes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Route ID</th>
+                        <th>Source</th>
+                        <th>Destination</th>
+                        <th>Schedule Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Routes will be populated here -->
+                </tbody>
+            </table>
+        </section>
+    </main>
 
     <script src="script.js"></script>
 </body>

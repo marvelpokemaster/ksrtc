@@ -1,4 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const loginModal = document.getElementById('login-modal');
+    const mainContent = document.getElementById('main-content');
+    const loginForm = document.getElementById('login-form');
+
+    loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        if (username === 'admin' && password === 'password123') {
+            loginModal.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+        } else {
+            alert('Invalid username or password.');
+        }
+    });
+
     fetchLocations();
 
     document.getElementById('search-form').addEventListener('submit', async function (e) {
@@ -14,13 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await fetch(`http://localhost:3000/routes?source=${source}&destination=${destination}&date=${date}`);
-            if (!response.ok) throw new Error('Network response was not ok');
-
             const routes = await response.json();
             displayRoutes(routes);
         } catch (err) {
             console.error(err);
-            alert('Error fetching routes. Please try again later.');
+            alert('Error fetching routes.');
         }
     });
 });
@@ -28,13 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchLocations() {
     try {
         const response = await fetch('http://localhost:3000/locations');
-        if (!response.ok) throw new Error('Network response was not ok');
-
         const data = await response.json();
         populateLocations(data);
     } catch (err) {
         console.error(err);
-        alert('Error fetching locations. Please try again later.');
+        alert('Error fetching locations.');
     }
 }
 
@@ -46,43 +59,13 @@ function populateLocations(data) {
     destinationSelect.innerHTML = '<option value="" disabled selected>Select Destination</option>';
 
     data.sources.forEach(source => {
-        const option = document.createElement('option');
-        option.value = source;
-        option.textContent = source;
-        sourceSelect.appendChild(option);
+        sourceSelect.innerHTML += `<option value="${source}">${source}</option>`;
     });
 
     data.destinations.forEach(destination => {
-        const option = document.createElement('option');
-        option.value = destination;
-        option.textContent = destination;
-        destinationSelect.appendChild(option);
+        destinationSelect.innerHTML += `<option value="${destination}">${destination}</option>`;
     });
 }
-
-function displayRoutes(routes) {
-    const routesList = document.getElementById('routes-list').querySelector('tbody');
-    routesList.innerHTML = '';
-
-    if (routes.length === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="5">No routes found.</td>';
-        routesList.appendChild(row);
-    } else {
-        routes.forEach(route => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${route.routeid}</td>
-                <td>${route.source}</td>
-                <td>${route.destination}</td>
-                <td>${route.scheduledate}</td>
-                <td><button onclick="selectRoute(${route.routeid})">Select</button></td>
-            `;
-            routesList.appendChild(row);
-        });
-    }
-}
-
 async function selectRoute(routeid) {
     const passengerName = prompt("Enter your name:");
     const contact = prompt("Enter your contact number:");
@@ -117,4 +100,22 @@ async function selectRoute(routeid) {
         console.error(err);
         alert('Error booking ticket. Please try again later.');
     }
+}
+
+function displayRoutes(routes) {
+    const tbody = document.querySelector('#routes-list tbody');
+    tbody.innerHTML = '';
+    routes.forEach(route => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${route.routeid}</td>
+                <td>${route.source}</td>
+                <td>${route.destination}</td>
+                <td>${route.scheduledate}</td>
+                <td><button onclick="selectRoute(${route.routeid})">Select</button></td>
+            </tr>
+        `;
+    });
+
+    document.getElementById('routes-list').classList.remove('hidden');
 }
