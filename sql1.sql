@@ -1,7 +1,6 @@
 -- Connect to the default database (postgres) and drop the existing database if necessary
 
 DROP DATABASE IF EXISTS ksrtc_db;
-\c postgres;
 -- Create the new ksrtc_db database
 CREATE DATABASE ksrtc_db;
 
