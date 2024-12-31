@@ -81,7 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok && data.success) {
                 alert(`Ticket booked successfully! Your ticket ID is ${data.ticketId}.`);
                 bookingModal.classList.add('hidden');
-                fetchBookings();
+                appendBooking({
+                    ticketid: data.ticketId,
+                    passengername: passengerName,
+                    contact: contact,
+                    seatnumber: seatNumber,
+                    routeid: selectedRouteId,
+                });
             } else {
                 throw new Error(data.error || 'Failed to book ticket');
             }
@@ -177,6 +183,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${booking.routeid}</td>
             </tr>
         `).join('');
+        bookingsTable.classList.remove('hidden');
+    }
+
+    // Append a single booking to "Your Bookings"
+    function appendBooking(booking) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${booking.ticketid}</td>
+            <td>${booking.passengername}</td>
+            <td>${booking.contact}</td>
+            <td>${booking.seatnumber}</td>
+            <td>${booking.routeid}</td>
+        `;
+        bookingsList.appendChild(row);
         bookingsTable.classList.remove('hidden');
     }
 });
