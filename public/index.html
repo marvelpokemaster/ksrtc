@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KSRTC Management System for easy booking and route management.">
     <title>KSRTC Management</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
     <div id="login-modal" class="modal">
@@ -17,7 +19,8 @@
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
-                <button type="submit" id="login-button">Login</button>
+                <button type="submit" id="login-button" class="primary-button" aria-label="Login to KSRTC">Login</button>
+                <button type="button" onclick="document.getElementById('login-modal').classList.add('hidden')">Close</button>
             </form>
         </div>
     </div>
@@ -41,9 +44,9 @@
                 </select>
 
                 <label for="date">Travel Date:</label>
-                <input type="date" id="date" name="date" required>
+                <input type="date" id="date" name="date" required min="${new Date().toISOString().split('T')[0]}">
 
-                <button type="submit">Search</button>
+                <button type="submit" class="primary-button" aria-label="Search for KSRTC routes">Search</button>
             </form>
         </section>
 
@@ -59,12 +62,52 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="routes-table-body">
                     <!-- Routes will be populated here -->
                 </tbody>
             </table>
         </section>
+
+        <section id="bookings-table" class="hidden">
+            <h2>Your Bookings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Passenger Name</th>
+                        <th>Contact</th>
+                        <th>Seat Number</th>
+                        <th>Route ID</th>
+                    </tr>
+                </thead>
+                <tbody id="bookings-list">
+                    <!-- Bookings will be populated here -->
+                </tbody>
+            </table>
+        </section>
     </main>
+
+    <div id="booking-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Book Your Ticket</h2>
+            <form id="booking-form">
+                <label for="passenger-name">Name:</label>
+                <input type="text" id="passenger-name" name="passenger-name" placeholder="Enter your name" required>
+
+                <label for="contact">Contact Number:</label>
+                <input type="text" id="contact" name="contact" placeholder="Enter your contact number" required>
+
+                <label for="seat-number">Seat Number:</label>
+                <input type="text" id="seat-number" name="seat-number" placeholder="Enter your seat number" required>
+
+                <button type="submit" class="primary-button" aria-label="Submit booking form">Book Ticket</button>
+                <button type="button" class="secondary-button" aria-label="Cancel booking" onclick="document.getElementById('booking-modal').classList.add('hidden')">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="error-message" class="hidden"></div>
+    <div id="loading-indicator" class="hidden">Loading...</div>
 
     <script src="script.js"></script>
 </body>

@@ -1,5 +1,4 @@
 -- Connect to the default database (postgres) and drop the existing database if necessary
-
 DROP DATABASE IF EXISTS ksrtc_db;
 -- Create the new ksrtc_db database
 CREATE DATABASE ksrtc_db;
@@ -91,41 +90,97 @@ CREATE TABLE Ticket (
 );
 
 -- Insert sample data
-
 INSERT INTO BusStand (StandLocation)
-VALUES ('Ernakulam Stand'), ('Thrissur Stand'), ('Kozhikode Stand');
+VALUES 
+    ('Ernakulam Stand'),
+    ('Thrissur Stand'),
+    ('Kozhikode Stand');
 
 INSERT INTO Driver (DriverName)
-VALUES ('Suresh Kumar'), ('Ramesh Nair');
+VALUES 
+    ('Suresh Kumar'),
+    ('Ramesh Nair');
 
 INSERT INTO Conductor (ConductorName)
-VALUES ('Ajith Menon'), ('Praveen Thomas');
+VALUES 
+    ('Ajith Menon'),
+    ('Praveen Thomas');
 
 INSERT INTO Assistant (AssistantName)
-VALUES ('Biju Varghese'), ('Shaji Mathew');
+VALUES 
+    ('Biju Varghese'),
+    ('Shaji Mathew');
 
 INSERT INTO Route (Source, Destination, ScheduleDate)
-VALUES ('Kochi', 'Trivandrum', '2024-12-29'), ('Kottayam', 'Palakkad', '2024-12-30');
+VALUES 
+    ('Kochi', 'Trivandrum', '2024-12-29'),
+    ('Kottayam', 'Palakkad', '2024-12-30'),
+    ('Kannur', 'Kasaragod', '2024-12-31'),
+    ('Alappuzha', 'Ernakulam', '2025-01-01'),
+    ('Thrissur', 'Malappuram', '2025-01-02'),
+    ('Kochi', 'Bangalore', '2025-01-03'),
+    ('Palakkad', 'Mysore', '2025-01-04');
 
 INSERT INTO Bus (BusType, Seats, DriverID, ConductorID, AssistantID)
-VALUES ('Fast Passenger', 40, 1, 1, 1), ('Super Deluxe', 30, 2, 2, 2);
+VALUES 
+    ('Fast Passenger', 40, 1, 1, 1),
+    ('Super Deluxe', 30, 2, 2, 2),
+    ('Express', 50, 1, 2, 1),
+    ('Super Fast', 45, 2, 1, 2),
+    ('Luxury', 30, 1, 2, 1),
+    ('Sleeper', 20, 2, 1, 2),
+    ('Air Conditioned', 35, 1, 1, 2);
 
 INSERT INTO AssignedTo (BusNumber, RouteID)
-VALUES (1, 1), (2, 2);
+VALUES 
+    (1, 1),
+    (2, 2),
+    (3, 3),
+    (4, 4),
+    (5, 5),
+    (6, 6),
+    (7, 7);
 
 INSERT INTO Halt (RouteID, SequenceNo, ArrivalTime, DepartureTime, StandID)
-VALUES (1, 1, '08:00:00', '08:15:00', 1),
-       (1, 2, '09:00:00', '09:15:00', 2),
-       (2, 1, '10:00:00', '10:15:00', 2),
-       (2, 2, '11:00:00', '11:15:00', 3);
+VALUES 
+    (1, 1, '08:00:00', '08:15:00', 1),
+    (1, 2, '09:00:00', '09:15:00', 2),
+    (2, 1, '10:00:00', '10:15:00', 2),
+    (2, 2, '11:00:00', '11:15:00', 3),
+    (3, 1, '07:00:00', '07:15:00', 1),
+    (3, 2, '08:30:00', '08:45:00', 2),
+    (4, 1, '09:00:00', '09:15:00', 3),
+    (4, 2, '10:30:00', '10:45:00', 1),
+    (5, 1, '06:00:00', '06:15:00', 2),
+    (5, 2, '07:45:00', '08:00:00', 3),
+    (6, 1, '05:00:00', '05:15:00', 1),
+    (6, 2, '07:30:00', '07:45:00', 3),
+    (7, 1, '03:00:00', '03:15:00', 2),
+    (7, 2, '05:30:00', '05:45:00', 1);
 
 INSERT INTO Passenger (PassengerName, Contact)
-VALUES ('Anjali Pillai', '9876543210'), ('Rajesh Menon', '8765432109');
+VALUES 
+    ('Anjali Pillai', '9876543210'),
+    ('Rajesh Menon', '8765432109'),
+    ('Deepa Nair', '9988776655'),
+    ('Arjun Das', '8877665544'),
+    ('Meera Krishnan', '7766554433');
 
 INSERT INTO Fare (RouteID, FareAmount)
-VALUES (1, 150.00), (2, 200.00);
+VALUES 
+    (1, 150.00),
+    (2, 200.00),
+    (3, 250.00),
+    (4, 180.00),
+    (5, 160.00),
+    (6, 500.00),
+    (7, 450.00);
 
 INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
-VALUES (1, 1, 5, 1), (2, 2, 10, 2);
+VALUES 
+    (1, 1, 5, 1),
+    (2, 2, 10, 2),
+    (3, 3, 3, 3),
+    (4, 4, 4, 4),
+    (5, 5, 5, 5);
 
--- The schema is now ready and populated with sample data.

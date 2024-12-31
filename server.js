@@ -32,7 +32,7 @@ app.get('/locations', async (req, res) => {
         const destinationResult = await pool.query('SELECT DISTINCT Destination FROM Route');
         const destinations = destinationResult.rows.map(row => row.destination);
 
-        console.log({ sources, destinations });  // Log the result to check
+        console.log({ sources, destinations });
 
         res.json({ sources, destinations });
     } catch (err) {
@@ -46,7 +46,10 @@ app.get('/routes', async (req, res) => {
     const { source, destination, date } = req.query;
     try {
         const result = await pool.query(
-            `SELECT * FROM Route WHERE Source = $1 AND Destination = $2 AND ScheduleDate = $3`,
+            `SELECT r.*, f.FareAmount 
+            FROM Route r
+            LEFT JOIN Fare f ON r.RouteID = f.RouteID
+            WHERE r.Source = $1 AND r.Destination = $2 AND r.ScheduleDate = $3`,
             [source, destination, date]
         );
         res.json(result.rows);
@@ -56,7 +59,6 @@ app.get('/routes', async (req, res) => {
     }
 });
 
-// Endpoint to book a ticket
 // Endpoint to book a ticket
 app.post('/book', async (req, res) => {
     const { routeId, passengerName, contact, seatNumber } = req.body;
@@ -80,11 +82,28 @@ app.post('/book', async (req, res) => {
 
         // Insert ticket
         const ticketResult = await pool.query(
-            'INSERT INTO Ticket (TicketID, PassengerID, RouteID, SeatNumber, FareID) VALUES (DEFAULT, $1, $2, $3, $4) RETURNING TicketID',
-            [passengerId, routeId, seatNumber, fare.FareID]
+            'INSERT INTO Ticket (RouteID, PassengerID, SeatNumber, FareID) VALUES ($1, $2, $3, $4) RETURNING TicketID',
+            [routeId, passengerId, seatNumber, fare.FareID]
         );
 
         res.json({ success: true, message: 'Ticket booked successfully!', ticketId: ticketResult.rows[0].ticketid });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Endpoint to fetch all bookings
+app.get('/bookings', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT t.TicketID, t.SeatNumber, p.PassengerName, p.Contact, r.Source, r.Destination, r.ScheduleDate, f.FareAmount
+            FROM Ticket t
+            JOIN Passenger p ON t.PassengerID = p.PassengerID
+            JOIN Route r ON t.RouteID = r.RouteID
+            JOIN Fare f ON t.FareID = f.FareID
+        `);
+        res.json(result.rows);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Database error' });

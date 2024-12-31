@@ -6,8 +6,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     background: linear-gradient(135deg, #3f87a6, #ebf8e1);
+    overflow-x: hidden;
 }
 
 /* Modal Styles */
@@ -21,6 +22,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 }
 
 .modal-content {
@@ -28,19 +30,23 @@ body {
     padding: 20px;
     border-radius: 10px;
     text-align: center;
-    width: 300px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease-out;
 }
 
 .modal-content h2 {
     margin-bottom: 20px;
     color: #333;
+    font-size: 1.5rem;
 }
 
 .modal-content form label {
     display: block;
     margin-bottom: 8px;
     text-align: left;
+    font-size: 0.9rem;
 }
 
 .modal-content form input {
@@ -49,6 +55,7 @@ body {
     margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    font-size: 1rem;
 }
 
 .modal-content form button {
@@ -59,10 +66,19 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 1rem;
 }
 
 .modal-content form button:hover {
     background-color: #45a049;
+}
+
+.modal-content form button.cancel {
+    background-color: #d9534f;
+}
+
+.modal-content form button.cancel:hover {
+    background-color: #c9302c;
 }
 
 /* Main Content */
@@ -71,19 +87,20 @@ body {
 }
 
 main {
-    width: 90%;
-    max-width: 800px;
+    width: 95%;
+    max-width: 900px;
     margin: 20px auto;
     background: white;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     text-align: center;
 }
 
 header h1 {
     margin: 0 0 20px;
     color: #333;
+    font-size: 2rem;
 }
 
 form {
@@ -93,6 +110,8 @@ form {
 form label {
     display: block;
     margin-bottom: 8px;
+    font-size: 1rem;
+    text-align: left;
 }
 
 form select, form input, form button {
@@ -101,6 +120,7 @@ form select, form input, form button {
     margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    font-size: 1rem;
 }
 
 form button {
@@ -108,6 +128,7 @@ form button {
     color: white;
     border: none;
     cursor: pointer;
+    font-size: 1rem;
 }
 
 form button:hover {
@@ -128,4 +149,48 @@ table th, table td {
 
 table th {
     background-color: #f4f4f4;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+table td {
+    font-size: 0.9rem;
+}
+
+button {
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Accessibility */
+:focus {
+    outline: 3px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    table th, table td {
+        font-size: 0.8rem;
+    }
+
+    modal-content {
+        width: 95%;
+    }
 }
