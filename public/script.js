@@ -160,12 +160,17 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '';
         routes.forEach(route => {
             const row = document.createElement('tr');
+            var convertedStartDate=new Date(route.scheduledate);
+            var month = convertedStartDate.getMonth() + 1
+            var date = convertedStartDate.getDate();
+            var year = convertedStartDate.getFullYear();
+            var short_date = date + "/" + month + "/" + year;
             row.innerHTML = `
                 <td>${route.routeid}</td>
                 <td>${route.source}</td>
                 <td>${route.destination}</td>
-                <td>${route.scheduledate}</td>
-                <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}">Book</button></td>
+                <td>${short_date}</td>
+                <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}">Select</button></td>
                 <td><button class="details-btn" data-routeid="${route.routeid}">Details</button></td>
             `;
             tbody.appendChild(row);
@@ -198,15 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Failed to fetch route details');
             const routeDetails = await response.json();
             
-            const { conductor, driver, halts } = routeDetails; // Include halts in the response
-            let haltsHTML = '<h3>Halt Info:</h3>';
-            
-            if (halts && halts.length > 0) {
-                haltsHTML += `<ul>${halts.map(halt => `<li>${halt}</li>`).join('')}</ul>`;
-            } else {
-                haltsHTML += '<p>No halts available for this route.</p>';
-            }
-    
+            const { conductor, driver } = routeDetails; // Assuming these are part of the response
             detailsContent.innerHTML = `
                 <h3>Conductor Info:</h3>
                 <p>Name: ${conductor.name}</p>
@@ -215,16 +212,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3>Driver Info:</h3>
                 <p>Name: ${driver.name}</p>
                 <p>Contact: ${driver.contact}</p>
-    
-                ${haltsHTML}
             `;
             detailsModal.classList.remove('hidden');
         } catch (err) {
-            console.error('Error fetching route details:', err);
+            console.error(err);
             alert('Error fetching route details.');
         }
     }
-    
+
     // Display bookings in table
     function displayBookings(bookings) {
         bookingsList.innerHTML = bookings.map(booking => `
