@@ -6,11 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookingForm = document.getElementById('booking-form');
     const bookingsTable = document.getElementById('bookings-table');
     const bookingsList = document.getElementById('bookings-list');
+    const detailsModal = document.getElementById('details-modal');
+    const detailsContent = document.getElementById('details-content');
 
     let selectedRouteId = null;
     let selectedFareId = null;
-    let selectedSource = null;
-    let selectedDestination = null;
 
     // Admin login functionality
     loginForm.addEventListener('submit', (e) => {
@@ -96,8 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     passengername: passengerName,
                     contact: contact,
                     seatnumber: seatNumber,
-                    source: selectedSource,  // Use selected source
-                    destination: selectedDestination // Use selected destination
+                    source: selectedRouteId, // this will be updated to source
+                    destination: selectedFareId // this will be updated to destination
                 });
             } else {
                 throw new Error(data.error || 'Failed to book ticket');
@@ -135,11 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Select route for booking
-    function selectRoute(routeId, fareId, source, destination) {
+    function selectRoute(routeId, fareId) {
         selectedRouteId = routeId;
         selectedFareId = fareId;
-        selectedSource = source;
-        selectedDestination = destination;
         bookingModal.classList.remove('hidden');
     }
 
@@ -167,7 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${route.source}</td>
                 <td>${route.destination}</td>
                 <td>${route.scheduledate}</td>
-                <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-source="${route.source}" data-destination="${route.destination}">Select</button></td>
+                <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}">Select</button></td>
+                <td><button class="details-btn" data-routeid="${route.routeid}">Details</button></td>
             `;
             tbody.appendChild(row);
         });
@@ -177,12 +176,43 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', (e) => {
                 const routeId = e.target.getAttribute('data-routeid');
                 const fareId = e.target.getAttribute('data-fareid');
-                const source = e.target.getAttribute('data-source');
-                const destination = e.target.getAttribute('data-destination');
-                selectRoute(routeId, fareId, source, destination);
+                selectRoute(routeId, fareId);
             });
         });
+
+        // Attach event listeners to "Details" buttons
+        document.querySelectorAll('.details-btn').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const routeId = e.target.getAttribute('data-routeid');
+                showRouteDetails(routeId); // Show details when clicked
+            });
+        });
+
         document.getElementById('routes-list').classList.remove('hidden');
+    }
+
+    // Show route details in a modal
+    async function showRouteDetails(routeId) {
+        try {
+            const response = await fetch(`http://localhost:3000/routes/${routeId}`);
+            if (!response.ok) throw new Error('Failed to fetch route details');
+            const routeDetails = await response.json();
+            
+            const { conductor, driver } = routeDetails; // Assuming these are part of the response
+            detailsContent.innerHTML = `
+                <h3>Conductor Info:</h3>
+                <p>Name: ${conductor.name}</p>
+                <p>Contact: ${conductor.contact}</p>
+                
+                <h3>Driver Info:</h3>
+                <p>Name: ${driver.name}</p>
+                <p>Contact: ${driver.contact}</p>
+            `;
+            detailsModal.classList.remove('hidden');
+        } catch (err) {
+            console.error(err);
+            alert('Error fetching route details.');
+        }
     }
 
     // Display bookings in table
@@ -193,8 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${booking.passengername}</td>
                 <td>${booking.contact}</td>
                 <td>${booking.seatnumber}</td>
-                <td>${booking.source}</td> <!-- Display Source -->
-                <td>${booking.destination}</td> <!-- Display Destination -->
+                <td>${booking.source}</td>
+                <td>${booking.destination}</td>
             </tr>
         `).join('');
         bookingsTable.classList.remove('hidden');
@@ -208,8 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${booking.passengername}</td>
             <td>${booking.contact}</td>
             <td>${booking.seatnumber}</td>
-            <td>${booking.source}</td> <!-- Display Source -->
-            <td>${booking.destination}</td> <!-- Display Destination -->
+            <td>${booking.source}</td>
+            <td>${booking.destination}</td>
         `;
         bookingsList.appendChild(row);
         bookingsTable.classList.remove('hidden');

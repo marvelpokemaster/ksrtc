@@ -60,6 +60,7 @@
                         <th>Destination</th>
                         <th>Date and Time</th>
                         <th>Action</th>
+                        <th>Details</th> <!-- New Details Column -->
                     </tr>
                 </thead>
                 <tbody id="routes-table-body">
@@ -104,6 +105,17 @@
                 <button type="submit" class="primary-button" aria-label="Submit booking form">Book Ticket</button>
                 <button type="button" class="secondary-button" aria-label="Cancel booking" onclick="document.getElementById('booking-modal').classList.add('hidden')">Cancel</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal for Route Details -->
+    <div id="details-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Route Details</h2>
+            <div id="details-content">
+                <!-- Details will be dynamically loaded here -->
+            </div>
+            <button type="button" class="secondary-button" onclick="document.getElementById('details-modal').classList.add('hidden')">Close</button>
         </div>
     </div>
 
