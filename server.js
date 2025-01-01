@@ -46,7 +46,7 @@ app.get('/routes', async (req, res) => {
     const { source, destination, date } = req.query;
     try {
         const result = await pool.query(
-            `SELECT r.*, f.FareAmount 
+            `SELECT r.*, f.FareID, f.FareAmount 
             FROM Route r
             LEFT JOIN Fare f ON r.RouteID = f.RouteID
             WHERE r.Source = $1 AND r.Destination = $2 AND r.ScheduleDate = $3`,
@@ -61,18 +61,8 @@ app.get('/routes', async (req, res) => {
 
 // Endpoint to book a ticket
 app.post('/book', async (req, res) => {
-    const { routeId, passengerName, contact, seatNumber } = req.body;
+    const { routeId, passengerName, contact, seatNumber, fareId } = req.body;
     try {
-        // Fetch fare for the route
-        const fareResult = await pool.query(
-            'SELECT FareID, FareAmount FROM Fare WHERE RouteID = $1',
-            [routeId]
-        );
-        if (fareResult.rows.length === 0) {
-            return res.status(400).json({ error: 'Fare not found for the selected route' });
-        }
-        const fare = fareResult.rows[0];
-
         // Insert passenger
         const passengerResult = await pool.query(
             'INSERT INTO Passenger (PassengerName, Contact) VALUES ($1, $2) RETURNING PassengerID',
@@ -83,7 +73,7 @@ app.post('/book', async (req, res) => {
         // Insert ticket
         const ticketResult = await pool.query(
             'INSERT INTO Ticket (RouteID, PassengerID, SeatNumber, FareID) VALUES ($1, $2, $3, $4) RETURNING TicketID',
-            [routeId, passengerId, seatNumber, fare.FareID]
+            [routeId, passengerId, seatNumber, fareId]
         );
 
         res.json({ success: true, message: 'Ticket booked successfully!', ticketId: ticketResult.rows[0].ticketid });

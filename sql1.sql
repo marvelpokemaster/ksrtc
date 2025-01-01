@@ -164,8 +164,10 @@ VALUES
     ('Rajesh Menon', '8765432109'),
     ('Deepa Nair', '9988776655'),
     ('Arjun Das', '8877665544'),
-    ('Meera Krishnan', '7766554433');
+    ('Meera Krishnan', '7766554433'),
+    ('Adarsh Binu', '9876567893');
 
+-- Insert Fare data corresponding to routes
 INSERT INTO Fare (RouteID, FareAmount)
 VALUES 
     (1, 150.00),
@@ -176,11 +178,26 @@ VALUES
     (6, 500.00),
     (7, 450.00);
 
-INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
-VALUES 
-    (1, 1, 5, 1),
-    (2, 2, 10, 2),
-    (3, 3, 3, 3),
-    (4, 4, 4, 4),
-    (5, 5, 5, 5);
+-- Insert into Ticket (ensure matching PassengerID, RouteID, SeatNumber, and FareID)
+-- This ensures that tickets are linked correctly with passengers and fares.
+-- For example, for Route 1, the FareID is 1, for Route 2 it's 2, and so on.
 
+-- Ticket for Anjali Pillai (Route 1, Seat 5, FareID 1)
+INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
+SELECT 1, 1, 5, f.FareID FROM Fare f WHERE f.RouteID = 1;
+
+-- Ticket for Rajesh Menon (Route 2, Seat 10, FareID 2)
+INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
+SELECT 2, 2, 10, f.FareID FROM Fare f WHERE f.RouteID = 2;
+
+-- Ticket for Deepa Nair (Route 3, Seat 3, FareID 3)
+INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
+SELECT 3, 3, 3, f.FareID FROM Fare f WHERE f.RouteID = 3;
+
+-- Ticket for Arjun Das (Route 4, Seat 4, FareID 4)
+INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
+SELECT 4, 4, 4, f.FareID FROM Fare f WHERE f.RouteID = 4;
+
+-- Ticket for Meera Krishnan (Route 5, Seat 5, FareID 5)
+INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
+SELECT 5, 5, 5, f.FareID FROM Fare f WHERE f.RouteID = 5;
