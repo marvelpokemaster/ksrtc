@@ -100,6 +100,33 @@ app.get('/bookings', async (req, res) => {
     }
 });
 
+// Endpoint to fetch route details
+app.get('/route-details/:id', async (req, res) => {
+    const routeId = req.params.id;
+    try {
+        // Query to fetch route details (with updated join query)
+        const result = await pool.query(
+            `SELECT r.RouteID, r.Source, r.Destination, r.ScheduleDate, c.ConductorName, d.DriverName, b.BusNumber
+            FROM Route r
+            LEFT JOIN AssignedTo a ON r.RouteID = a.RouteID
+            LEFT JOIN Bus b ON a.BusNumber = b.BusNumber
+            LEFT JOIN Conductor c ON b.ConductorID = c.ConductorID
+            LEFT JOIN Driver d ON b.DriverID = d.DriverID
+            WHERE r.RouteID = $1`,
+            [routeId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: "Route details not found" });
+        }
+
+        res.json({ success: true, details: result.rows[0] });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: 'Database error' });
+    }
+});
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
