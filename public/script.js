@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedRouteId = null;
     let selectedFareId = null;
+    let selectedSource = null;
+    let selectedDestination = null;
 
     // Admin login functionality
     loginForm.addEventListener('submit', (e) => {
@@ -94,8 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     passengername: passengerName,
                     contact: contact,
                     seatnumber: seatNumber,
-                    routeid: selectedRouteId,
-                    fareid: selectedFareId
+                    source: selectedSource,  // Use selected source
+                    destination: selectedDestination // Use selected destination
                 });
             } else {
                 throw new Error(data.error || 'Failed to book ticket');
@@ -133,9 +135,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Select route for booking
-    function selectRoute(routeId, fareId) {
+    function selectRoute(routeId, fareId, source, destination) {
         selectedRouteId = routeId;
         selectedFareId = fareId;
+        selectedSource = source;
+        selectedDestination = destination;
         bookingModal.classList.remove('hidden');
     }
 
@@ -163,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${route.source}</td>
                 <td>${route.destination}</td>
                 <td>${route.scheduledate}</td>
-                <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}">Select</button></td>
+                <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-source="${route.source}" data-destination="${route.destination}">Select</button></td>
             `;
             tbody.appendChild(row);
         });
@@ -173,7 +177,9 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', (e) => {
                 const routeId = e.target.getAttribute('data-routeid');
                 const fareId = e.target.getAttribute('data-fareid');
-                selectRoute(routeId, fareId);
+                const source = e.target.getAttribute('data-source');
+                const destination = e.target.getAttribute('data-destination');
+                selectRoute(routeId, fareId, source, destination);
             });
         });
         document.getElementById('routes-list').classList.remove('hidden');
@@ -187,8 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${booking.passengername}</td>
                 <td>${booking.contact}</td>
                 <td>${booking.seatnumber}</td>
-                <td>${booking.routeid}</td>
-                <td>${booking.fareid}</td>
+                <td>${booking.source}</td> <!-- Display Source -->
+                <td>${booking.destination}</td> <!-- Display Destination -->
             </tr>
         `).join('');
         bookingsTable.classList.remove('hidden');
@@ -202,8 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${booking.passengername}</td>
             <td>${booking.contact}</td>
             <td>${booking.seatnumber}</td>
-            <td>${booking.routeid}</td>
-            <td>${booking.fareid}</td>
+            <td>${booking.source}</td> <!-- Display Source -->
+            <td>${booking.destination}</td> <!-- Display Destination -->
         `;
         bookingsList.appendChild(row);
         bookingsTable.classList.remove('hidden');
