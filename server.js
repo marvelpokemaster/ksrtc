@@ -32,8 +32,6 @@ app.get('/locations', async (req, res) => {
         const destinationResult = await pool.query('SELECT DISTINCT Destination FROM Route');
         const destinations = destinationResult.rows.map(row => row.destination);
 
-        console.log({ sources, destinations });
-
         res.json({ sources, destinations });
     } catch (err) {
         console.error(err);
@@ -63,14 +61,12 @@ app.get('/routes', async (req, res) => {
 app.post('/book', async (req, res) => {
     const { routeId, passengerName, contact, seatNumber, fareId } = req.body;
     try {
-        // Insert passenger
         const passengerResult = await pool.query(
             'INSERT INTO Passenger (PassengerName, Contact) VALUES ($1, $2) RETURNING PassengerID',
             [passengerName, contact]
         );
         const passengerId = passengerResult.rows[0].passengerid;
 
-        // Insert ticket
         const ticketResult = await pool.query(
             'INSERT INTO Ticket (RouteID, PassengerID, SeatNumber, FareID) VALUES ($1, $2, $3, $4) RETURNING TicketID',
             [routeId, passengerId, seatNumber, fareId]
@@ -100,12 +96,11 @@ app.get('/bookings', async (req, res) => {
     }
 });
 
-// Endpoint to fetch route details
+// Endpoint to fetch route details with halts
 app.get('/route-details/:id', async (req, res) => {
     const routeId = req.params.id;
     try {
-        // Query to fetch route details (with updated join query)
-        const result = await pool.query(
+        const routeDetailsResult = await pool.query(
             `SELECT r.RouteID, r.Source, r.Destination, r.ScheduleDate, c.ConductorName, d.DriverName, b.BusNumber
             FROM Route r
             LEFT JOIN AssignedTo a ON r.RouteID = a.RouteID
@@ -116,11 +111,31 @@ app.get('/route-details/:id', async (req, res) => {
             [routeId]
         );
 
-        if (result.rows.length === 0) {
+        if (routeDetailsResult.rows.length === 0) {
             return res.status(404).json({ success: false, message: "Route details not found" });
         }
 
-        res.json({ success: true, details: result.rows[0] });
+        const haltsResult = await pool.query(
+            `SELECT HaltName FROM Halts WHERE RouteID = $1`,
+            [routeId]
+        );
+
+        const routeDetails = routeDetailsResult.rows[0];
+        const halts = haltsResult.rows.map(row => row.haltname);
+
+        res.json({
+            success: true,
+            details: {
+                routeId: routeDetails.routeid,
+                source: routeDetails.source,
+                destination: routeDetails.destination,
+                scheduleDate: routeDetails.scheduledate,
+                conductor: routeDetails.conductorname,
+                driver: routeDetails.drivername,
+                busNumber: routeDetails.busnumber,
+                halts
+            }
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, error: 'Database error' });
