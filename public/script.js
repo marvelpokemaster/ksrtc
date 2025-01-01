@@ -199,19 +199,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show route details in a modal
     async function showRouteDetails(routeId) {
         try {
-            const response = await fetch(`http://localhost:3000/routes/${routeId}`);
+            const response = await fetch(`http://localhost:3000/route-details/${routeId}`);
             if (!response.ok) throw new Error('Failed to fetch route details');
-            const routeDetails = await response.json();
+            const data = await response.json();
             
-            const { conductor, driver } = routeDetails; // Assuming these are part of the response
+            console.log(data);
+            
+            // Access the first object in the routeDetails array
+            const routeDetail = data.routeDetails[0]; 
+            
+            // Access the conductor and driver names from the routeDetail object
+            const conductorName = routeDetail.conductorname || 'N/A';
+            const driverName = routeDetail.drivername || 'N/A';
+            
             detailsContent.innerHTML = `
                 <h3>Conductor Info:</h3>
-                <p>Name: ${conductor.name}</p>
-                <p>Contact: ${conductor.contact}</p>
+                <p>Name: ${conductorName}</p>
                 
                 <h3>Driver Info:</h3>
-                <p>Name: ${driver.name}</p>
-                <p>Contact: ${driver.contact}</p>
+                <p>Name: ${driverName}</p>
             `;
             detailsModal.classList.remove('hidden');
         } catch (err) {
@@ -219,6 +225,8 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error fetching route details.');
         }
     }
+    
+    
 
     // Display bookings in table
     function displayBookings(bookings) {

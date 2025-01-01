@@ -56,6 +56,28 @@ app.get('/routes', async (req, res) => {
         res.status(500).json({ error: 'Database error' });
     }
 });
+app.get('/routes', async (req, res) => {
+    const { source, destination, date } = req.query;
+    try {
+        const result = await pool.query(
+            `SELECT r.RouteID, r.Source, r.Destination, r.ScheduleDate, 
+                    a.BusNumber, 
+                    c.ConductorID, c.ConductorName, 
+                    d.DriverID, d.DriverName
+             FROM Route r
+             LEFT JOIN AssignedTo a ON r.RouteID = a.RouteID
+             LEFT JOIN Bus b ON a.BusNumber = b.BusNumber
+             LEFT JOIN Conductor c ON b.ConductorID = c.ConductorID
+             LEFT JOIN Driver d ON b.DriverID = d.DriverID
+             WHERE r.Source = $1 AND r.Destination = $2 AND r.ScheduleDate = $3`,
+            [source, destination, date]
+        );
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
 
 // Endpoint to book a ticket
 app.post('/book', async (req, res) => {
@@ -99,46 +121,37 @@ app.get('/bookings', async (req, res) => {
 // Endpoint to fetch route details with halts
 app.get('/route-details/:id', async (req, res) => {
     const routeId = req.params.id;
+
     try {
+        // Query to fetch route details
         const routeDetailsResult = await pool.query(
             `SELECT r.RouteID, r.Source, r.Destination, r.ScheduleDate, c.ConductorName, d.DriverName, b.BusNumber
-            FROM Route r
-            LEFT JOIN AssignedTo a ON r.RouteID = a.RouteID
-            LEFT JOIN Bus b ON a.BusNumber = b.BusNumber
-            LEFT JOIN Conductor c ON b.ConductorID = c.ConductorID
-            LEFT JOIN Driver d ON b.DriverID = d.DriverID
-            WHERE r.RouteID = $1`,
+             FROM Route r
+             LEFT JOIN AssignedTo a ON r.RouteID = a.RouteID
+             LEFT JOIN Bus b ON a.BusNumber = b.BusNumber
+             LEFT JOIN Conductor c ON b.ConductorID = c.ConductorID
+             LEFT JOIN Driver d ON b.DriverID = d.DriverID
+             WHERE r.RouteID = $1`,
             [routeId]
         );
 
-        if (routeDetailsResult.rows.length === 0) {
-            return res.status(404).json({ success: false, message: "Route details not found" });
-        }
-
+        // Query to fetch halts for the route
         const haltsResult = await pool.query(
-            `SELECT HaltName FROM Halts WHERE RouteID = $1`,
+            `SELECT haltid FROM halt WHERE RouteID = $1`,
             [routeId]
         );
+        
 
-        const routeDetails = routeDetailsResult.rows[0];
-        const halts = haltsResult.rows.map(row => row.haltname);
-
+        // Respond with route details and halts
         res.json({
-            success: true,
-            details: {
-                routeId: routeDetails.routeid,
-                source: routeDetails.source,
-                destination: routeDetails.destination,
-                scheduleDate: routeDetails.scheduledate,
-                conductor: routeDetails.conductorname,
-                driver: routeDetails.drivername,
-                busNumber: routeDetails.busnumber,
-                halts
-            }
+            // success: true,
+            routeDetails: routeDetailsResult.rows
+            // halts: haltsResult.rows,
         });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, error: 'Database error' });
+    } catch (error) {
+        // Log the error and respond with a database error message
+        console.error('Database error:', error);
+        res.json({ success: false, error: 'Database error' });
     }
 });
 
