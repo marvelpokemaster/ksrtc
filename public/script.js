@@ -8,8 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookingsList = document.getElementById('bookings-list');
 
     let selectedRouteId = null;
+    let selectedFareId = null;
 
-    // Admin login
+    // Admin login functionality
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const username = document.getElementById('username').value.trim();
@@ -23,10 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Fetch locations for dropdowns
+    // Initialize locations and bookings
     fetchLocations();
+    fetchBookings();
 
-    // Route search form
+    // Route search form submission
     document.getElementById('search-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const source = document.getElementById('source').value;
@@ -61,8 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const contact = document.getElementById('contact').value.trim();
         const seatNumber = document.getElementById('seat-number').value.trim();
 
-        if (!selectedRouteId) {
-            alert('A route must be selected.');
+        if (!selectedRouteId || !selectedFareId) {
+            alert('A route and fare must be selected.');
             return;
         }
         if (!passengerName || !contact || !seatNumber) {
@@ -74,10 +76,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('http://localhost:3000/book', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ routeId: selectedRouteId, passengerName, contact, seatNumber }),
+                body: JSON.stringify({
+                    routeId: selectedRouteId,
+                    fareId: selectedFareId,
+                    passengerName,
+                    contact,
+                    seatNumber
+                }),
             });
-            const data = await response.json();
 
+            const data = await response.json();
             if (response.ok && data.success) {
                 alert(`Ticket booked successfully! Your ticket ID is ${data.ticketId}.`);
                 bookingModal.classList.add('hidden');
@@ -87,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     contact: contact,
                     seatnumber: seatNumber,
                     routeid: selectedRouteId,
+                    fareid: selectedFareId
                 });
             } else {
                 throw new Error(data.error || 'Failed to book ticket');
@@ -97,10 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Fetch initial bookings
-    fetchBookings();
-
-    // Fetch locations for dropdown menus
+    // Fetch locations for dropdowns
     async function fetchLocations() {
         try {
             const response = await fetch('http://localhost:3000/locations');
@@ -127,10 +133,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Select route for booking
-    function selectRoute(routeId) {
-        console.log('Route selected:', routeId);
+    function selectRoute(routeId, fareId) {
         selectedRouteId = routeId;
-        document.getElementById('booking-modal').classList.remove('hidden');
+        selectedFareId = fareId;
+        bookingModal.classList.remove('hidden');
     }
 
     // Fetch and display bookings
@@ -157,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${route.source}</td>
                 <td>${route.destination}</td>
                 <td>${route.scheduledate}</td>
-                <td><button class="select-route" data-routeid="${route.routeid}">Select</button></td>
+                <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}">Select</button></td>
             `;
             tbody.appendChild(row);
         });
@@ -166,7 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.select-route').forEach(button => {
             button.addEventListener('click', (e) => {
                 const routeId = e.target.getAttribute('data-routeid');
-                selectRoute(routeId);
+                const fareId = e.target.getAttribute('data-fareid');
+                selectRoute(routeId, fareId);
             });
         });
         document.getElementById('routes-list').classList.remove('hidden');
@@ -181,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${booking.contact}</td>
                 <td>${booking.seatnumber}</td>
                 <td>${booking.routeid}</td>
+                <td>${booking.fareid}</td>
             </tr>
         `).join('');
         bookingsTable.classList.remove('hidden');
@@ -195,6 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${booking.contact}</td>
             <td>${booking.seatnumber}</td>
             <td>${booking.routeid}</td>
+            <td>${booking.fareid}</td>
         `;
         bookingsList.appendChild(row);
         bookingsTable.classList.remove('hidden');
