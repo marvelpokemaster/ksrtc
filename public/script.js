@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${route.bustype}</td>
                 <td>${route.fareamount}</td>
                 <td>
-                    <button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}">Select</button>
+                    <button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-busno="${route.busno}">Select</button>
                 </td>
                 <td>
                     <button class="details-btn" data-routeid="${route.routeid}">Details</button>
@@ -181,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', (e) => {
                 const routeId = e.target.getAttribute('data-routeid');
                 const fareId = e.target.getAttribute('data-fareid');
+                const busn=e.target.getAttribute('data-busno');
                 selectRoute(routeId, fareId);
             });
         });
