@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
+const { password } = require('pg/lib/defaults');
 
 const app = express();
 const port = 3000;
@@ -81,26 +82,40 @@ app.get('/routes', async (req, res) => {
 
 // Endpoint to book a ticket
 app.post('/book', async (req, res) => {
+<<<<<<< HEAD
     const { routeId, passengerName, contact, seatNumber, fareId } = req.body;
+=======
+    
+    const { routeId, passengerName, contact, seatNumber, busNumber, fareId } = req.body;
+    console.log(fareId+","+passengerName);
+>>>>>>> 0ce3646 (lll pranav)
     try {
+        // Insert passenger and get the PassengerID
         const passengerResult = await pool.query(
             'INSERT INTO Passenger (PassengerName, Contact) VALUES ($1, $2) RETURNING PassengerID',
             [passengerName, contact]
         );
         const passengerId = passengerResult.rows[0].passengerid;
-
+        console.log(busNumber+"hey"+fareId);
+        // Insert ticket with the bus number
         const ticketResult = await pool.query(
-            'INSERT INTO Ticket (RouteID, PassengerID, SeatNumber, FareID) VALUES ($1, $2, $3, $4) RETURNING TicketID',
-            [routeId, passengerId, seatNumber, fareId]
+            'INSERT INTO Ticket (RouteID, PassengerID, SeatNumber, BusNumber, FareID) VALUES ($1, $2, $3, $4, $5) RETURNING TicketID',
+            [routeId, passengerId, seatNumber, busNumber, fareId]
         );
 
         res.json({ success: true, message: 'Ticket booked successfully!', ticketId: ticketResult.rows[0].ticketid });
     } catch (err) {
+<<<<<<< HEAD
         console.error(err);
+=======
+        console.error('Error booking ticket:', err);
+        if (err.code === '23505') { // Unique violation error code for PostgreSQL
+            return res.status(400).json({ error: 'This seat is already booked for the selected bus.' });
+        }
+>>>>>>> 0ce3646 (lll pranav)
         res.status(500).json({ error: 'Database error' });
     }
 });
-
 // Endpoint to fetch all bookings
 app.get('/bookings', async (req, res) => {
     try {

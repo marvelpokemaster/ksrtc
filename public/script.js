@@ -11,8 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedRouteId = null;
     let selectedFareId = null;
+<<<<<<< HEAD
     let selectedSource = null;
     let selectedDestination = null;
+=======
+    let selectedBusno = null;
+>>>>>>> 0ce3646 (lll pranav)
 
     // Admin login functionality
     loginForm.addEventListener('submit', (e) => {
@@ -77,12 +81,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            console.log("hey");
+            console.log(selectedBusno);
             const response = await fetch('http://localhost:3000/book', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     routeId: selectedRouteId,
                     fareId: selectedFareId,
+                    busnumber:selectedBusno,
                     passengerName,
                     contact,
                     seatNumber
@@ -137,11 +144,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Select route for booking
+<<<<<<< HEAD
     function selectRoute(routeId, fareId, source, destination) {
         selectedRouteId = routeId;
         selectedFareId = fareId;
         selectedSource = source; // capture source
         selectedDestination = destination; // capture destination
+=======
+    function selectRoute(routeId, fareId,busn) {
+        selectedRouteId = routeId;
+        selectedFareId = fareId;
+        selectedBusno=busn;
+>>>>>>> 0ce3646 (lll pranav)
         bookingModal.classList.remove('hidden');
     }
 
@@ -170,12 +184,24 @@ document.addEventListener('DOMContentLoaded', () => {
             var year = convertedStartDate.getFullYear();
             var short_date = date + "/" + month + "/" + year;
             row.innerHTML = `
+<<<<<<< HEAD
                 <td>${route.routeid}</td>
                 <td>${route.source}</td>
                 <td>${route.destination}</td>
                 <td>${short_date}</td>
                 <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-source="${route.source}" data-destination="${route.destination}">Select</button></td>
                 <td><button class="details-btn" data-routeid="${route.routeid}">Details</button></td>
+=======
+               
+                <td>${route.bustype}</td>
+                <td>${route.busnumber}</td>
+                <td>
+                    <button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-busno="${route.bus}">Select</button>
+                </td>
+                <td>
+                    <button class="details-btn" data-routeid="${route.routeid}">Details</button>
+                </td>
+>>>>>>> 0ce3646 (lll pranav)
             `;
             tbody.appendChild(row);
         });
@@ -185,9 +211,14 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', (e) => {
                 const routeId = e.target.getAttribute('data-routeid');
                 const fareId = e.target.getAttribute('data-fareid');
+<<<<<<< HEAD
                 const source = e.target.getAttribute('data-source');
                 const destination = e.target.getAttribute('data-destination');
                 selectRoute(routeId, fareId, source, destination);
+=======
+                const busn=e.target.getAttribute('data-busno');
+                selectRoute(routeId, fareId,busn);
+>>>>>>> 0ce3646 (lll pranav)
             });
         });
 
