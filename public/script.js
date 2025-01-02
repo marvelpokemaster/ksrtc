@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     fareId: selectedFareId,
                     passengerName,
                     contact,
-                    seatNumber
+                    seatNumber,
                 }),
             });
 
@@ -96,8 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     passengername: passengerName,
                     contact: contact,
                     seatnumber: seatNumber,
-                    source: selectedRouteId, // this will be updated to source
-                    destination: selectedFareId // this will be updated to destination
+                    source: selectedRouteId, // Placeholder to update with actual source
+                    destination: selectedFareId, // Placeholder to update with actual destination
                 });
             } else {
                 throw new Error(data.error || 'Failed to book ticket');
@@ -160,18 +160,18 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '';
         routes.forEach(route => {
             const row = document.createElement('tr');
-            var convertedStartDate=new Date(route.scheduledate);
-            var month = convertedStartDate.getMonth() + 1
-            var date = convertedStartDate.getDate();
-            var year = convertedStartDate.getFullYear();
-            var short_date = date + "/" + month + "/" + year;
             row.innerHTML = `
-                <td>${route.routeid}</td>
                 <td>${route.source}</td>
                 <td>${route.destination}</td>
-                <td>${short_date}</td>
-                <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}">Select</button></td>
-                <td><button class="details-btn" data-routeid="${route.routeid}">Details</button></td>
+                <td>${route.scheduledate}</td>
+                <td>${route.bustype}</td>
+                <td>${route.fareamount}</td>
+                <td>
+                    <button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}">Select</button>
+                </td>
+                <td>
+                    <button class="details-btn" data-routeid="${route.routeid}">Details</button>
+                </td>
             `;
             tbody.appendChild(row);
         });
@@ -185,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Attach event listeners to "Details" buttons
         document.querySelectorAll('.details-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const routeId = e.target.getAttribute('data-routeid');
@@ -202,20 +201,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`http://localhost:3000/route-details/${routeId}`);
             if (!response.ok) throw new Error('Failed to fetch route details');
             const data = await response.json();
-            
-            console.log(data);
-            
+
             // Access the first object in the routeDetails array
-            const routeDetail = data.routeDetails[0]; 
-            
+            const routeDetail = data.routeDetails[0];
+
             // Access the conductor and driver names from the routeDetail object
             const conductorName = routeDetail.conductorname || 'N/A';
             const driverName = routeDetail.drivername || 'N/A';
-            
+
             detailsContent.innerHTML = `
                 <h3>Conductor Info:</h3>
                 <p>Name: ${conductorName}</p>
-                
+
                 <h3>Driver Info:</h3>
                 <p>Name: ${driverName}</p>
             `;
@@ -225,8 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error fetching route details.');
         }
     }
-    
-    
 
     // Display bookings in table
     function displayBookings(bookings) {

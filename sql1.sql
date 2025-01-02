@@ -83,10 +83,13 @@ CREATE TABLE Ticket (
     PassengerID INT,
     RouteID INT,
     SeatNumber INT,
+    BusNumber INT
     FareID INT,
     FOREIGN KEY (PassengerID) REFERENCES Passenger(PassengerID),
     FOREIGN KEY (RouteID) REFERENCES Route(RouteID),
-    FOREIGN KEY (FareID) REFERENCES Fare(FareID)
+    FOREIGN KEY (FareID) REFERENCES Fare(FareID),
+    FOREIGN KEY (BusNumber) REFERENCES Bus(BusNumber),
+    UNIQUE (BusNumber,SeatNumber)
 );
 
 -- Insert sample data

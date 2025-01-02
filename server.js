@@ -19,22 +19,22 @@ const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
     database: 'ksrtc_db',
-    password: 'password',
+    password: 'ackzr05',
     port: 5432,
 });
 
 // Endpoint to fetch all available source and destination locations for dropdown
 app.get('/locations', async (req, res) => {
     try {
-        const result = await pool.query('SELECT DISTINCT Source FROM Route');
-        const sources = result.rows.map(row => row.source);
+        const sourceResult = await pool.query('SELECT DISTINCT Source FROM Route');
+        const sources = sourceResult.rows.map(row => row.source);
 
         const destinationResult = await pool.query('SELECT DISTINCT Destination FROM Route');
         const destinations = destinationResult.rows.map(row => row.destination);
 
         res.json({ sources, destinations });
     } catch (err) {
-        console.error(err);
+        console.error('Error fetching locations:', err);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -44,44 +44,33 @@ app.get('/routes', async (req, res) => {
     const { source, destination, date } = req.query;
     try {
         const result = await pool.query(
-            `SELECT r.*, f.FareID, f.FareAmount 
+            `SELECT 
+                r.RouteID, 
+                r.Source, 
+                r.Destination, 
+                r.ScheduleDate, 
+                f.FareID, 
+                f.FareAmount, 
+                b.BusType,
+                b.BusNumber
             FROM Route r
             LEFT JOIN Fare f ON r.RouteID = f.RouteID
+            LEFT JOIN AssignedTo a ON r.RouteID = a.RouteID
+            LEFT JOIN Bus b ON a.BusNumber = b.BusNumber
             WHERE r.Source = $1 AND r.Destination = $2 AND r.ScheduleDate = $3`,
             [source, destination, date]
         );
+
         res.json(result.rows);
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-app.get('/routes', async (req, res) => {
-    const { source, destination, date } = req.query;
-    try {
-        const result = await pool.query(
-            `SELECT r.RouteID, r.Source, r.Destination, r.ScheduleDate, 
-                    a.BusNumber, 
-                    c.ConductorID, c.ConductorName, 
-                    d.DriverID, d.DriverName
-             FROM Route r
-             LEFT JOIN AssignedTo a ON r.RouteID = a.RouteID
-             LEFT JOIN Bus b ON a.BusNumber = b.BusNumber
-             LEFT JOIN Conductor c ON b.ConductorID = c.ConductorID
-             LEFT JOIN Driver d ON b.DriverID = d.DriverID
-             WHERE r.Source = $1 AND r.Destination = $2 AND r.ScheduleDate = $3`,
-            [source, destination, date]
-        );
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
+        console.error('Error executing query:', err);
         res.status(500).json({ error: 'Database error' });
     }
 });
 
 // Endpoint to book a ticket
 app.post('/book', async (req, res) => {
-    const { routeId, passengerName, contact, seatNumber, fareId } = req.body;
+    const { routeId, passengerName, contact, seatNumber, busNumber, fareId } = req.body;
     try {
         const passengerResult = await pool.query(
             'INSERT INTO Passenger (PassengerName, Contact) VALUES ($1, $2) RETURNING PassengerID',
@@ -96,7 +85,7 @@ app.post('/book', async (req, res) => {
 
         res.json({ success: true, message: 'Ticket booked successfully!', ticketId: ticketResult.rows[0].ticketid });
     } catch (err) {
-        console.error(err);
+        console.error('Error booking ticket:', err);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -105,7 +94,8 @@ app.post('/book', async (req, res) => {
 app.get('/bookings', async (req, res) => {
     try {
         const result = await pool.query(`
-            SELECT t.TicketID, t.SeatNumber, p.PassengerName, p.Contact, r.Source, r.Destination, r.ScheduleDate, f.FareAmount
+            SELECT t.TicketID, t.SeatNumber, p.PassengerName, p.Contact, 
+                   r.Source, r.Destination, r.ScheduleDate, f.FareAmount
             FROM Ticket t
             JOIN Passenger p ON t.PassengerID = p.PassengerID
             JOIN Route r ON t.RouteID = r.RouteID
@@ -113,19 +103,20 @@ app.get('/bookings', async (req, res) => {
         `);
         res.json(result.rows);
     } catch (err) {
-        console.error(err);
+        console.error('Error fetching bookings:', err);
         res.status(500).json({ error: 'Database error' });
     }
 });
 
-// Endpoint to fetch route details with halts
+// Endpoint to fetch route details with bus number
 app.get('/route-details/:id', async (req, res) => {
     const routeId = req.params.id;
 
     try {
-        // Query to fetch route details
-        const routeDetailsResult = await pool.query(
-            `SELECT r.RouteID, r.Source, r.Destination, r.ScheduleDate, c.ConductorName, d.DriverName, b.BusNumber
+        const result = await pool.query(
+            `SELECT r.RouteID, r.Source, r.Destination, r.ScheduleDate, 
+                    b.BusNumber, b.BusType, 
+                    c.ConductorName, d.DriverName
              FROM Route r
              LEFT JOIN AssignedTo a ON r.RouteID = a.RouteID
              LEFT JOIN Bus b ON a.BusNumber = b.BusNumber
@@ -135,23 +126,14 @@ app.get('/route-details/:id', async (req, res) => {
             [routeId]
         );
 
-        // Query to fetch halts for the route
-        const haltsResult = await pool.query(
-            `SELECT haltid FROM halt WHERE RouteID = $1`,
-            [routeId]
-        );
-        
-
-        // Respond with route details and halts
-        res.json({
-            // success: true,
-            routeDetails: routeDetailsResult.rows
-            // halts: haltsResult.rows,
-        });
-    } catch (error) {
-        // Log the error and respond with a database error message
-        console.error('Database error:', error);
-        res.json({ success: false, error: 'Database error' });
+        if (result.rows.length > 0) {
+            res.json({ routeDetails: result.rows });
+        } else {
+            res.status(404).json({ error: 'Route not found' });
+        }
+    } catch (err) {
+        console.error('Error fetching route details:', err);
+        res.status(500).json({ error: 'Database error' });
     }
 });
 
