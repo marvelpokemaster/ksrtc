@@ -86,7 +86,7 @@ CREATE TABLE Ticket (
     TicketID SERIAL PRIMARY KEY,
     PassengerID INT,
     RouteID INT,
-    SeatNumber INT,
+    SeatNumber SERIAL,
     FareID INT,
     FOREIGN KEY (PassengerID) REFERENCES Passenger(PassengerID),
     FOREIGN KEY (RouteID) REFERENCES Route(RouteID),
