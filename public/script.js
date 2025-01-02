@@ -11,12 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedRouteId = null;
     let selectedFareId = null;
-<<<<<<< HEAD
-    let selectedSource = null;
-    let selectedDestination = null;
-=======
     let selectedBusno = null;
->>>>>>> 0ce3646 (lll pranav)
 
     // Admin login functionality
     loginForm.addEventListener('submit', (e) => {
@@ -92,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     busnumber:selectedBusno,
                     passengerName,
                     contact,
-                    seatNumber
+                    seatNumber,
                 }),
             });
 
@@ -105,8 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     passengername: passengerName,
                     contact: contact,
                     seatnumber: seatNumber,
-                    source: selectedSource, // now using selectedSource
-                    destination: selectedDestination // now using selectedDestination
+                    source: selectedRouteId, // Placeholder to update with actual source
+                    destination: selectedFareId, // Placeholder to update with actual destination
                 });
             } else {
                 throw new Error(data.error || 'Failed to book ticket');
@@ -144,18 +139,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Select route for booking
-<<<<<<< HEAD
-    function selectRoute(routeId, fareId, source, destination) {
-        selectedRouteId = routeId;
-        selectedFareId = fareId;
-        selectedSource = source; // capture source
-        selectedDestination = destination; // capture destination
-=======
     function selectRoute(routeId, fareId,busn) {
         selectedRouteId = routeId;
         selectedFareId = fareId;
         selectedBusno=busn;
->>>>>>> 0ce3646 (lll pranav)
         bookingModal.classList.remove('hidden');
     }
 
@@ -178,34 +165,16 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '';
         routes.forEach(route => {
             const row = document.createElement('tr');
-            var convertedStartDate = new Date(route.scheduledate);
-            var month = convertedStartDate.getMonth() + 1;
-            var date = convertedStartDate.getDate();
-            var year = convertedStartDate.getFullYear();
-            var short_date = date + "/" + month + "/" + year;
             row.innerHTML = `
-<<<<<<< HEAD
-                <td>${route.routeid}</td>
-                <td>${route.source}</td>
-                <td>${route.destination}</td>
-                <td>${short_date}</td>
-                <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-source="${route.source}" data-destination="${route.destination}">Select</button></td>
-                <td><button class="details-btn" data-routeid="${route.routeid}">Details</button></td>
-=======
                
                 <td>${route.bustype}</td>
                 <td>${route.busnumber}</td>
                 <td>
-<<<<<<< HEAD
                     <button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-busno="${route.bus}">Select</button>
-=======
-                    <button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-busno="${route.busno}">Select</button>
->>>>>>> a3846b1 (pranav's half cook)
                 </td>
                 <td>
                     <button class="details-btn" data-routeid="${route.routeid}">Details</button>
                 </td>
->>>>>>> 0ce3646 (lll pranav)
             `;
             tbody.appendChild(row);
         });
@@ -215,23 +184,11 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', (e) => {
                 const routeId = e.target.getAttribute('data-routeid');
                 const fareId = e.target.getAttribute('data-fareid');
-<<<<<<< HEAD
-<<<<<<< HEAD
-                const source = e.target.getAttribute('data-source');
-                const destination = e.target.getAttribute('data-destination');
-                selectRoute(routeId, fareId, source, destination);
-=======
                 const busn=e.target.getAttribute('data-busno');
                 selectRoute(routeId, fareId,busn);
->>>>>>> 0ce3646 (lll pranav)
-=======
-                const busn=e.target.getAttribute('data-busno');
-                selectRoute(routeId, fareId);
->>>>>>> a3846b1 (pranav's half cook)
             });
         });
 
-        // Attach event listeners to "Details" buttons
         document.querySelectorAll('.details-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const routeId = e.target.getAttribute('data-routeid');
@@ -248,8 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`http://localhost:3000/route-details/${routeId}`);
             if (!response.ok) throw new Error('Failed to fetch route details');
             const data = await response.json();
-
-            console.log(data);
 
             // Access the first object in the routeDetails array
             const routeDetail = data.routeDetails[0];
