@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedRouteId = null;
     let selectedFareId = null;
+    let selectedSource = null;
+    let selectedDestination = null;
 
     // Admin login functionality
     loginForm.addEventListener('submit', (e) => {
@@ -96,8 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     passengername: passengerName,
                     contact: contact,
                     seatnumber: seatNumber,
-                    source: selectedRouteId, // this will be updated to source
-                    destination: selectedFareId // this will be updated to destination
+                    source: selectedSource, // now using selectedSource
+                    destination: selectedDestination // now using selectedDestination
                 });
             } else {
                 throw new Error(data.error || 'Failed to book ticket');
@@ -135,9 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Select route for booking
-    function selectRoute(routeId, fareId) {
+    function selectRoute(routeId, fareId, source, destination) {
         selectedRouteId = routeId;
         selectedFareId = fareId;
+        selectedSource = source; // capture source
+        selectedDestination = destination; // capture destination
         bookingModal.classList.remove('hidden');
     }
 
@@ -160,8 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '';
         routes.forEach(route => {
             const row = document.createElement('tr');
-            var convertedStartDate=new Date(route.scheduledate);
-            var month = convertedStartDate.getMonth() + 1
+            var convertedStartDate = new Date(route.scheduledate);
+            var month = convertedStartDate.getMonth() + 1;
             var date = convertedStartDate.getDate();
             var year = convertedStartDate.getFullYear();
             var short_date = date + "/" + month + "/" + year;
@@ -170,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${route.source}</td>
                 <td>${route.destination}</td>
                 <td>${short_date}</td>
-                <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}">Select</button></td>
+                <td><button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-source="${route.source}" data-destination="${route.destination}">Select</button></td>
                 <td><button class="details-btn" data-routeid="${route.routeid}">Details</button></td>
             `;
             tbody.appendChild(row);
@@ -181,7 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', (e) => {
                 const routeId = e.target.getAttribute('data-routeid');
                 const fareId = e.target.getAttribute('data-fareid');
-                selectRoute(routeId, fareId);
+                const source = e.target.getAttribute('data-source');
+                const destination = e.target.getAttribute('data-destination');
+                selectRoute(routeId, fareId, source, destination);
             });
         });
 
@@ -202,20 +208,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`http://localhost:3000/route-details/${routeId}`);
             if (!response.ok) throw new Error('Failed to fetch route details');
             const data = await response.json();
-            
+
             console.log(data);
-            
+
             // Access the first object in the routeDetails array
-            const routeDetail = data.routeDetails[0]; 
-            
+            const routeDetail = data.routeDetails[0];
+
             // Access the conductor and driver names from the routeDetail object
             const conductorName = routeDetail.conductorname || 'N/A';
             const driverName = routeDetail.drivername || 'N/A';
-            
+
             detailsContent.innerHTML = `
                 <h3>Conductor Info:</h3>
                 <p>Name: ${conductorName}</p>
-                
+
                 <h3>Driver Info:</h3>
                 <p>Name: ${driverName}</p>
             `;
@@ -225,8 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error fetching route details.');
         }
     }
-    
-    
 
     // Display bookings in table
     function displayBookings(bookings) {

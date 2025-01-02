@@ -1,5 +1,6 @@
 -- Connect to the default database (postgres) and drop the existing database if necessary
 DROP DATABASE IF EXISTS ksrtc_db;
+
 -- Create the new ksrtc_db database
 CREATE DATABASE ksrtc_db;
 
@@ -14,17 +15,20 @@ CREATE TABLE BusStand (
 
 CREATE TABLE Driver (
     DriverID SERIAL PRIMARY KEY,
-    DriverName VARCHAR(50)
+    DriverName VARCHAR(50),
+    Contact VARCHAR(15)
 );
 
 CREATE TABLE Conductor (
     ConductorID SERIAL PRIMARY KEY,
-    ConductorName VARCHAR(50)
+    ConductorName VARCHAR(50),
+    Contact VARCHAR(15)
 );
 
 CREATE TABLE Assistant (
     AssistantID SERIAL PRIMARY KEY,
-    AssistantName VARCHAR(50)
+    AssistantName VARCHAR(50),
+    Contact VARCHAR(15)
 );
 
 CREATE TABLE Route (
@@ -96,20 +100,28 @@ VALUES
     ('Thrissur Stand'),
     ('Kozhikode Stand');
 
-INSERT INTO Driver (DriverName)
+INSERT INTO Driver (DriverName, Contact)
 VALUES 
-    ('Suresh Kumar'),
-    ('Ramesh Nair');
+    ('Suresh Kumar', '9999988888'),
+    ('Ramesh Nair', '8888877777'),
+    ('Anil Kumar', '7777766666'),
+    ('Prakash Pillai', '6666655555'),
+    ('George Mathew', '5555544444');
 
-INSERT INTO Conductor (ConductorName)
+INSERT INTO Conductor (ConductorName, Contact)
 VALUES 
-    ('Ajith Menon'),
-    ('Praveen Thomas');
+    ('Ajith Menon', '4444433333'),
+    ('Praveen Thomas', '3333322222'),
+    ('Manoj Kumar', '2222211111'),
+    ('Hari Das', '1111100000'),
+    ('Kiran John', '0000099999');
 
-INSERT INTO Assistant (AssistantName)
+INSERT INTO Assistant (AssistantName, Contact)
 VALUES 
-    ('Biju Varghese'),
-    ('Shaji Mathew');
+    ('Biju Varghese', '9898989898'),
+    ('Shaji Mathew', '9797979797'),
+    ('Vijay Kumar', '9696969696'),
+    ('Arun Joseph', '9595959595');
 
 INSERT INTO Route (Source, Destination, ScheduleDate)
 VALUES 
@@ -125,11 +137,11 @@ INSERT INTO Bus (BusType, Seats, DriverID, ConductorID, AssistantID)
 VALUES 
     ('Fast Passenger', 40, 1, 1, 1),
     ('Super Deluxe', 30, 2, 2, 2),
-    ('Express', 50, 1, 2, 1),
-    ('Super Fast', 45, 2, 1, 2),
-    ('Luxury', 30, 1, 2, 1),
-    ('Sleeper', 20, 2, 1, 2),
-    ('Air Conditioned', 35, 1, 1, 2);
+    ('Express', 50, 3, 3, 3),
+    ('Super Fast', 45, 4, 4, 4),
+    ('Luxury', 30, 5, 5, 1),
+    ('Sleeper', 20, 1, 2, 2),
+    ('Air Conditioned', 35, 2, 3, 3);
 
 INSERT INTO AssignedTo (BusNumber, RouteID)
 VALUES 
@@ -178,26 +190,18 @@ VALUES
     (6, 500.00),
     (7, 450.00);
 
--- Insert into Ticket (ensure matching PassengerID, RouteID, SeatNumber, and FareID)
--- This ensures that tickets are linked correctly with passengers and fares.
--- For example, for Route 1, the FareID is 1, for Route 2 it's 2, and so on.
-
--- Ticket for Anjali Pillai (Route 1, Seat 5, FareID 1)
+-- Insert tickets
 INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
 SELECT 1, 1, 5, f.FareID FROM Fare f WHERE f.RouteID = 1;
 
--- Ticket for Rajesh Menon (Route 2, Seat 10, FareID 2)
 INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
 SELECT 2, 2, 10, f.FareID FROM Fare f WHERE f.RouteID = 2;
 
--- Ticket for Deepa Nair (Route 3, Seat 3, FareID 3)
 INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
 SELECT 3, 3, 3, f.FareID FROM Fare f WHERE f.RouteID = 3;
 
--- Ticket for Arjun Das (Route 4, Seat 4, FareID 4)
 INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
 SELECT 4, 4, 4, f.FareID FROM Fare f WHERE f.RouteID = 4;
 
--- Ticket for Meera Krishnan (Route 5, Seat 5, FareID 5)
 INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
 SELECT 5, 5, 5, f.FareID FROM Fare f WHERE f.RouteID = 5;
