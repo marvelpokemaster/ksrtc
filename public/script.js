@@ -196,7 +196,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${route.bustype}</td>
                 <td>${route.busnumber}</td>
                 <td>
+<<<<<<< HEAD
                     <button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-busno="${route.bus}">Select</button>
+=======
+                    <button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-busno="${route.busno}">Select</button>
+>>>>>>> a3846b1 (pranav's half cook)
                 </td>
                 <td>
                     <button class="details-btn" data-routeid="${route.routeid}">Details</button>
@@ -212,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const routeId = e.target.getAttribute('data-routeid');
                 const fareId = e.target.getAttribute('data-fareid');
 <<<<<<< HEAD
+<<<<<<< HEAD
                 const source = e.target.getAttribute('data-source');
                 const destination = e.target.getAttribute('data-destination');
                 selectRoute(routeId, fareId, source, destination);
@@ -219,6 +224,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const busn=e.target.getAttribute('data-busno');
                 selectRoute(routeId, fareId,busn);
 >>>>>>> 0ce3646 (lll pranav)
+=======
+                const busn=e.target.getAttribute('data-busno');
+                selectRoute(routeId, fareId);
+>>>>>>> a3846b1 (pranav's half cook)
             });
         });
 
