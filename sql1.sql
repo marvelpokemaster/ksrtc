@@ -83,13 +83,13 @@ CREATE TABLE Ticket (
     PassengerID INT,
     RouteID INT,
     SeatNumber INT,
-    BusNumber INT
+    BusNumber INT,
     FareID INT,
     FOREIGN KEY (PassengerID) REFERENCES Passenger(PassengerID),
     FOREIGN KEY (RouteID) REFERENCES Route(RouteID),
     FOREIGN KEY (FareID) REFERENCES Fare(FareID),
     FOREIGN KEY (BusNumber) REFERENCES Bus(BusNumber),
-    UNIQUE (BusNumber,SeatNumber)
+    UNIQUE (BusNumber, SeatNumber)
 );
 
 -- Insert sample data
@@ -186,21 +186,38 @@ VALUES
 -- For example, for Route 1, the FareID is 1, for Route 2 it's 2, and so on.
 
 -- Ticket for Anjali Pillai (Route 1, Seat 5, FareID 1)
-INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
-SELECT 1, 1, 5, f.FareID FROM Fare f WHERE f.RouteID = 1;
+INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID, BusNumber)
+SELECT 1, 1, 5, f.FareID, 1 FROM Fare f WHERE f.RouteID = 1;
 
 -- Ticket for Rajesh Menon (Route 2, Seat 10, FareID 2)
-INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
-SELECT 2, 2, 10, f.FareID FROM Fare f WHERE f.RouteID = 2;
+INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID, BusNumber)
+SELECT 2, 2, 10, f.FareID, 2 FROM Fare f WHERE f.RouteID = 2;
 
 -- Ticket for Deepa Nair (Route 3, Seat 3, FareID 3)
-INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
-SELECT 3, 3, 3, f.FareID FROM Fare f WHERE f.RouteID = 3;
+INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID, BusNumber)
+SELECT 3, 3, 3, f.FareID, 3 FROM Fare f WHERE f.RouteID = 3;
 
 -- Ticket for Arjun Das (Route 4, Seat 4, FareID 4)
-INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
-SELECT 4, 4, 4, f.FareID FROM Fare f WHERE f.RouteID = 4;
+INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID, BusNumber)
+SELECT 4, 4, 4, f.FareID, 4 FROM Fare f WHERE f.RouteID = 4;
 
 -- Ticket for Meera Krishnan (Route 5, Seat 5, FareID 5)
-INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID)
-SELECT 5, 5, 5, f.FareID FROM Fare f WHERE f.RouteID = 5;
+INSERT INTO Ticket (PassengerID, RouteID, SeatNumber, FareID, BusNumber)
+SELECT 5, 5, 5, f.FareID, 5 FROM Fare f WHERE f.RouteID = 5;
+
+-- Create the function to check seat number validity
+CREATE OR REPLACE FUNCTION check_seat_number_valid()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check if the SeatNumber is within the valid range for the given BusNumber
+    IF NEW.SeatNumber < 1 OR NEW.SeatNumber > (SELECT Seats FROM Bus WHERE BusNumber = NEW.BusNumber) THEN
+        RAISE EXCEPTION 'SeatNumber must be between 1 and the number of seats available for the bus';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create the trigger to enforce the seat number validity on INSERT and UPDATE operations
+CREATE TRIGGER seat_number_check
+BEFORE INSERT OR UPDATE ON Ticket
+FOR EACH ROW EXECUTE FUNCTION check_seat_number_valid();

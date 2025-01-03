@@ -76,15 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            console.log("hey");
-            console.log(selectedBusno);
             const response = await fetch('http://localhost:3000/book', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     routeId: selectedRouteId,
                     fareId: selectedFareId,
-                    busnumber:selectedBusno,
+                    busnumber: selectedBusno,
                     passengerName,
                     contact,
                     seatNumber,
@@ -100,8 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     passengername: passengerName,
                     contact: contact,
                     seatnumber: seatNumber,
-                    source: selectedRouteId, // Placeholder to update with actual source
-                    destination: selectedFareId, // Placeholder to update with actual destination
+                    source: selectedRouteId, // Placeholder for actual source
+                    destination: selectedFareId, // Placeholder for actual destination
                 });
             } else {
                 throw new Error(data.error || 'Failed to book ticket');
@@ -139,10 +137,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Select route for booking
-    function selectRoute(routeId, fareId,busn) {
+    function selectRoute(routeId, fareId, busn) {
         selectedRouteId = routeId;
         selectedFareId = fareId;
-        selectedBusno=busn;
+        selectedBusno = busn;
         bookingModal.classList.remove('hidden');
     }
 
@@ -166,11 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
         routes.forEach(route => {
             const row = document.createElement('tr');
             row.innerHTML = `
-               
                 <td>${route.bustype}</td>
                 <td>${route.busnumber}</td>
                 <td>
-                    <button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-busno="${route.bus}">Select</button>
+                    <button class="select-route" data-routeid="${route.routeid}" data-fareid="${route.fareid}" data-busno="${route.busnumber}">Select</button>
                 </td>
                 <td>
                     <button class="details-btn" data-routeid="${route.routeid}">Details</button>
@@ -179,20 +176,19 @@ document.addEventListener('DOMContentLoaded', () => {
             tbody.appendChild(row);
         });
 
-        // Attach event listeners to dynamically created buttons
         document.querySelectorAll('.select-route').forEach(button => {
             button.addEventListener('click', (e) => {
                 const routeId = e.target.getAttribute('data-routeid');
                 const fareId = e.target.getAttribute('data-fareid');
-                const busn=e.target.getAttribute('data-busno');
-                selectRoute(routeId, fareId,busn);
+                const busn = e.target.getAttribute('data-busno');
+                selectRoute(routeId, fareId, busn);
             });
         });
 
         document.querySelectorAll('.details-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const routeId = e.target.getAttribute('data-routeid');
-                showRouteDetails(routeId); // Show details when clicked
+                showRouteDetails(routeId);
             });
         });
 
@@ -206,10 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Failed to fetch route details');
             const data = await response.json();
 
-            // Access the first object in the routeDetails array
             const routeDetail = data.routeDetails[0];
-
-            // Access the conductor and driver names from the routeDetail object
             const conductorName = routeDetail.conductorname || 'N/A';
             const driverName = routeDetail.drivername || 'N/A';
 
